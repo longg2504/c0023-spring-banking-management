@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Withdraw</title>
+    <link rel="stylesheet" href="/assets/bootstrap/v5.30/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/fontawesome/v.5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+
+<body>
+<div class="container">
+    <div class="table-title">
+        <div class="row">
+            <div class="col-sm-5">
+                <h1>Withdraw</h1>
+            </div>
+            <div class="col-sm-7">
+                <a href="/customers" class="btn btn-outline-light">
+                    <i class="fa-solid fa-bars"></i>
+                    <span>List of customers</span>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div>
+        <form method="post" autocomplete="off" th:object="${withdraw}">
+            <div class="row mt-3">
+
+                <div class="mb-3 float-left col-lg-3 col-sm-12 col-md-6">
+                    <label for="senderID" class="form-label">Customer ID</label>
+                    <input type="number" class="form-control" id="senderID"
+                           th:value="${withdraw.getCustomer().id}" readonly
+                    >
+                </div>
+                <div class="mb-3 float-left col-lg-3 col-sm-12 col-md-6">
+                    <label for="senderName" class="form-label">Customer Name</label>
+                    <input type="text" class="form-control" id="senderName"
+                           th:value="${withdraw.getCustomer().fullName}" readonly
+                    >
+                </div>
+                <div class="mb-3 float-left col-lg-3 col-sm-12 col-md-6">
+                    <label for="email" class="form-label">Customer Email</label>
+                    <input type="email" class="form-control" id="email"
+                           th:value="${withdraw.getCustomer().email}" readonly
+                    >
+                </div>
+                <div class="mb-3 float-left col-lg-3 col-sm-12 col-md-6">
+                    <label for="balance" class="form-label">Customer Balance</label>
+                    <input type="number" class="form-control" id="balance"
+                           th:value="${withdraw.getCustomer().balance}" readonly
+                    >
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="mb-3 float-left col-lg-3 col-sm-12 col-md-6">
+                    <label for="withdraw" class="form-label">Withdraw Amount (VND)</label>
+                    <input type="number" class="form-control" id="withdraw" name="withdraw" th:value="0">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-outline-warning">
+                <i class="fas fa-exchange-alt"></i>
+                Withdraw
+            </button>
+        </form>
+    </div>
+</div>
+
+
+</body>
+
+</html>
