@@ -39,7 +39,7 @@
                 <th>Phone</th>
                 <th>Address</th>
                 <th>Balance</th>
-                <th colspan="4">Action</th>
+                <th colspan="5">Action</th>
             </tr>
             </thead>
             <tbody>
@@ -73,7 +73,7 @@
                         </a>
                     </td>
                     <td>
-                        <a title="Transfer" th:href="@{/customers/transfer/{id}(id=${item.id})}">
+                        <a title="Transfer" th:href="@{/customers/transfer/__${item.id}__}">
                             <button class="btn btn-outline-warning">
                                 <i class="fas fa-exchange-alt"></i>
                             </button>

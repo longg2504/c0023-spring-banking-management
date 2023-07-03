@@ -2,12 +2,14 @@ package com.cg.controller;
 
 import com.cg.model.Customer;
 import com.cg.model.Deposit;
+import com.cg.model.Transfer;
 import com.cg.model.Withdraw;
 import com.cg.service.customer.ICustomerService;
 import com.cg.service.deposit.IDepositService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -34,7 +36,7 @@ public class CustomerController {
 
         return "customer/list";
     }
-
+//-----------------------------------------------------------------Get Mapping -----------------------------------------------------------------
     @GetMapping("/create")
     public String showCreatePage() {
         return "customer/create";
@@ -117,8 +119,32 @@ public class CustomerController {
         }
 
     }
+    @GetMapping("/transfer/{senderId}")
+    public String showTransferPage(@PathVariable Long senderId , Model model){
+        Optional<Customer> senderOptional  = customerService.findById(senderId);
+        // isPresent() Phương thức này dùng để kiểm tra một đối tượng Optional có không rỗng hay không? Nếu đối tượng này bị rỗng thì nó sẽ trả về false.
+        if(!senderOptional.isPresent()){
+            model.addAttribute("error", true);
+            model.addAttribute("messages", "Sender not found");
+        }
+        else{
+            Customer sender = senderOptional.get();
 
+            Transfer transfer = new Transfer();
 
+            transfer.setSender(sender);
+
+            model.addAttribute("transfer",transfer);
+
+            List<Customer> recipients = customerService.findAllByIdNotAndDeletedIsFalse(senderId);
+
+            model.addAttribute("recipients", recipients);
+
+        }
+        return "customer/transfer";
+    }
+
+//----------------------------------------PostMapping----------------------------------------
     @PostMapping("/create")
     public String doCreate(@ModelAttribute Customer customer) {
 
@@ -191,4 +217,69 @@ public class CustomerController {
             return "/errors/404";
         }
     }
+
+    @PostMapping("/transfer/{senderId}")
+    public String doTransfer(@PathVariable Long senderId ,@ModelAttribute Transfer transfer, Model model){
+        Optional<Customer> senderOptional = customerService.findById(senderId);
+        List<Customer> recipients = customerService.findAllByIdNotAndDeletedIsFalse(senderId);
+
+        model.addAttribute("recipients", recipients);
+        model.addAttribute("transfer", transfer);
+
+        if (!senderOptional.isPresent()) {
+            model.addAttribute("error", true);
+            model.addAttribute("messages", "Sender not valid");
+
+            return "customer/transfer";
+        }
+
+        Long recipientId = transfer.getRecipient().getId();
+        Optional<Customer> recipientOptional = customerService.findById(recipientId);
+
+        if (!recipientOptional.isPresent()) {
+            model.addAttribute("error", true);
+            model.addAttribute("messages", "Recipient not valid");
+
+            return "customer/transfer";
+        }
+        if (senderId.equals(recipientId)) {
+            model.addAttribute("error", true);
+            model.addAttribute("messages", "Sender ID must be different from Recipient ID");
+
+            return "customer/transfer";
+        }
+
+        BigDecimal senderCurrentBalance = senderOptional.get().getBalance();
+
+        String transferAmountStr = String.valueOf(transfer.getTransferAmount());
+        BigDecimal transferAmount = BigDecimal.valueOf(Long.parseLong(transferAmountStr));
+        long fees = 10L;
+        BigDecimal feesAmount = transferAmount.multiply(BigDecimal.valueOf(fees)).divide(BigDecimal.valueOf(100));
+        BigDecimal transactionAmount = transferAmount.add(feesAmount);
+
+        if (senderCurrentBalance.compareTo(transactionAmount) < 0) {
+            model.addAttribute("error", true);
+            model.addAttribute("messages", "Sender balance not enough to transfer");
+
+            return "customer/transfer";
+        }
+
+        transfer.setSender(senderOptional.get());
+        transfer.setFees(fees);
+        transfer.setFeesAmount(feesAmount);
+        transfer.setTransactionAmount(transactionAmount);
+
+        customerService.transfer(transfer);
+
+        transfer.setTransferAmount(BigDecimal.ZERO);
+        transfer.setTransactionAmount(BigDecimal.ZERO);
+
+        model.addAttribute("transfer", transfer);
+
+        model.addAttribute("success", true);
+        model.addAttribute("messages", "Transfer success");
+
+        return "customer/transfer";
+    }
+
 }
