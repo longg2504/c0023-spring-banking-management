@@ -1,7 +1,6 @@
 package com.cg.model;
 
 import javax.persistence.*;
-import javax.xml.transform.sax.SAXTransformerFactory;
 import java.math.BigDecimal;
 
 @Entity
@@ -21,7 +20,7 @@ public class Customer extends BaseEntity {
 
     private String address;
 
-    @Column(precision = 12, columnDefinition = "decimal default 0")
+    @Column(precision = 10, scale = 0, nullable = false)
     private BigDecimal balance;
 
     public Customer(Long id, String fullName, String email, String phone, String address, BigDecimal balance) {

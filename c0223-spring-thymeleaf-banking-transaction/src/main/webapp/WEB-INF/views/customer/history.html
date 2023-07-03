@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Transfer</title>
+  <link rel="stylesheet" href="/assets/bootstrap/v5.30/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/assets/fontawesome/v.5.15.4/css/all.min.css">
+  <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body>
+<header>
+  <div class="col-lg-6">
+    <h1>History Page</h1>
+  </div>
+  <div class="col-lg-6 header-right-button">
+    <a href="/customers">
+      <button class="btn btn-outline-light">
+        <i class="fas fa-bars"></i>
+        List of customers
+      </button>
+    </a>
+  </div>
+</header>
+<div>
+  <table class="table table-hover">
+    <thead>
+    <tr>
+      <th>Id</th>
+      <th>Sender ID</th>
+      <th>Sender Name</th>
+      <th>Recipient ID</th>
+      <th>Recipient Name</th>
+      <th>Transfer Amount</th>
+      <th>Fees</th>
+      <th>Fees Amount</th>
+      <th>Transaction Amount</th>
+    </tr>
+    </thead>
+    <tbody>
+    <th:block th:each="item : ${transfers}">
+      <tr>
+        <td th:text="${item.id}"></td>
+        <td th:text="${item.sender.id}"></td>
+        <td th:text="${item.sender.fullName}"></td>
+        <td th:text="${item.recipient.id}"></td>
+        <td th:text="${item.recipient.fullName}"></td>
+        <td th:text="${item.transferAmount}"></td>
+        <td th:text="${item.fees}"></td>
+        <td th:text="${item.feesAmount}"></td>
+        <td th:text="${item.transactionAmount}"></td>
+      </tr>
+    </th:block>
+    </tbody>
+    <tfoot>
+    <tr>
+      <td colspan="5"></td>
+      <td colspan="2">Tổng tiền phí:</td>
+      <td colspan="2" th:text="${totalFeesAmount}"></td>
+    </tr>
+    </tfoot>
+  </table>
+</div>
+</body>
+</html>

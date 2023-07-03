@@ -9,26 +9,26 @@
 
 <body>
 <div class="container">
-    <div class="table-title">
-        <div class="row">
-            <div class="col-sm-5">
-                <h1>Withdraw</h1>
-            </div>
-            <div class="col-sm-7">
-                <a href="/customers" class="btn btn-outline-light">
-                    <i class="fa-solid fa-bars"></i>
-                    <span>List of customers</span>
-                </a>
-            </div>
+    <header>
+        <div class="col-lg-6">
+            <h1>With Draw</h1>
         </div>
-    </div>
+        <div class="col-lg-6 header-right-button">
+            <a href="/customers">
+                <button class="btn btn-outline-light">
+                    <i class="fas fa-bars"></i>
+                    List Customers
+                </button>
+            </a>
+        </div>
+    </header>
     <div>
-        <form method="post" autocomplete="off" th:object="${withdraw}">
+        <form method="post"  th:object="${withdraw}">
             <div class="row mt-3">
 
                 <div class="mb-3 float-left col-lg-3 col-sm-12 col-md-6">
-                    <label for="senderID" class="form-label">Customer ID</label>
-                    <input type="number" class="form-control" id="senderID"
+                    <label  class="form-label">Customer ID</label>
+                    <input type="number" class="form-control" name="idCustomer"
                            th:value="${withdraw.getCustomer().id}" readonly
                     >
                 </div>
@@ -54,7 +54,7 @@
             <div class="row mt-3">
                 <div class="mb-3 float-left col-lg-3 col-sm-12 col-md-6">
                     <label for="withdraw" class="form-label">Withdraw Amount (VND)</label>
-                    <input type="number" class="form-control" id="withdraw" name="withdraw" th:value="0">
+                    <input type="number" class="form-control" id="withdraw" name="transactionAmount" >
                 </div>
             </div>
             <button type="submit" class="btn btn-outline-warning">
@@ -64,7 +64,23 @@
         </form>
     </div>
 </div>
+<footer class="container-fluid">
+    <th:block th:if="${error == true}">
+        <div class="success">
+            <ul class="container">
+                <li th:text="${message}"></li>
+            </ul>
+        </div>
+    </th:block>
 
+    <th:block th:if="${success == true}">
+        <div class="success">
+            <ul class="container">
+                <li th:text="${message}"></li>
+            </ul>
+        </div>
+    </th:block>
+</footer>
 
 </body>
 

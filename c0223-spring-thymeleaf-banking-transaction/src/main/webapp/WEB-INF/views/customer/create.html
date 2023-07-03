@@ -15,10 +15,10 @@
         </div>
         <div class="col-lg-6 header-right-button">
             <a href="/customers">
-            <button class="btn btn-outline-light">
-                <i class="fas fa-bars"></i>
-                List Customer
-            </button>
+                <button class="btn btn-outline-light">
+                    <i class="fas fa-bars"></i>
+                    List Customer
+                </button>
             </a>
         </div>
     </header>
@@ -56,7 +56,16 @@
         </form>
     </div>
 </div>
-</div>
-</div>
+
+<footer class="container-fluid">
+
+    <th:block th:if="${success == true}">
+        <div class="success">
+            <ul class="container">
+                <li th:text="${messages}"></li>
+            </ul>
+        </div>
+    </th:block>
+</footer>
 </body>
 </html>

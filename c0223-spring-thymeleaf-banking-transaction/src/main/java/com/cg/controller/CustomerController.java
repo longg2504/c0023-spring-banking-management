@@ -6,6 +6,7 @@ import com.cg.model.Transfer;
 import com.cg.model.Withdraw;
 import com.cg.service.customer.ICustomerService;
 import com.cg.service.deposit.IDepositService;
+import com.cg.service.withdraw.IWithdrawService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -28,10 +29,12 @@ public class CustomerController {
     @Autowired
     private IDepositService depositService;
 
+    @Autowired
+    private IWithdrawService withdrawService;
+
     @GetMapping
     public String showListPage(Model model) {
         List<Customer> customers = customerService.findAll();
-
         model.addAttribute("customers", customers);
 
         return "customer/list";
@@ -39,6 +42,7 @@ public class CustomerController {
 //-----------------------------------------------------------------Get Mapping -----------------------------------------------------------------
     @GetMapping("/create")
     public String showCreatePage() {
+
         return "customer/create";
     }
 
@@ -62,7 +66,7 @@ public class CustomerController {
         return "customer/deposit";
     }
 
-    @GetMapping("/edit/{id}")
+    @GetMapping("/update/{id}")
     public String showUpdate(@PathVariable String id, Model model) {
         try {
             Long customerId = Long.parseLong(id);
@@ -73,9 +77,7 @@ public class CustomerController {
             }
 
             Customer customer = customerOptional.get();
-
             model.addAttribute("customer", customer);
-
             return "/customer/edit";
         } catch (Exception e) {
             return "/errors/404";
@@ -146,11 +148,14 @@ public class CustomerController {
 
 //----------------------------------------PostMapping----------------------------------------
     @PostMapping("/create")
-    public String doCreate(@ModelAttribute Customer customer) {
+    public String doCreate(@ModelAttribute Customer customer, Model model) {
 
         customer.setId(null);
         customer.setBalance(BigDecimal.ZERO);
         customerService.save(customer);
+
+        model.addAttribute("success", true);
+        model.addAttribute("messages", "Create customer successful");
 
         return "customer/create";
     }
@@ -166,56 +171,66 @@ public class CustomerController {
         else {
             Customer customer = customerOptional.get();
 
-            deposit.setId(customerId);
-            depositService.save(deposit);
-
-            BigDecimal currentBalance = customer.getBalance();
-            BigDecimal newBalance = currentBalance.add(deposit.getTransactionAmount());
-            customer.setBalance(newBalance);
-            customerService.save(customer);
-
             deposit.setCustomer(customer);
+            deposit = customerService.deposit(deposit);
+
+            deposit.setTransactionAmount(BigDecimal.ZERO);
 
             model.addAttribute("deposit", deposit);
         }
+        model.addAttribute("success", true);
+        model.addAttribute("messages", "Deposit successful");
+
 
         return "customer/deposit";
     }
-    @PostMapping("/edit/{id}")
+    @PostMapping("/update/{id}")
     public String toUpdate(@PathVariable Long id, Model model, @ModelAttribute Customer customer) {
-
-        customer.setId(id);
-        customerService.save(customer);
-        List<Customer> customers = customerService.findAll();
-        model.addAttribute("customers", customers);
-        return "redirect:/customers";
-    }
-    @PostMapping("/withdraw/{id}")
-    public String toWithdraw(@PathVariable String id,Model model,@RequestParam("withdraw") String withdraw){
-        try{
-            Long customerId = Long.parseLong(id);
-            Long withdrawAmount = Long.parseLong(withdraw);
-            Optional<Customer> customerOptional = customerService.findById(customerId);
-
-            if (customerOptional.isEmpty()) {
-                return "redirect:/errors/404";
-            }
-
-            Customer customer = customerOptional.get();
-
-            BigDecimal balance = customer.getBalance().subtract(BigDecimal.valueOf(withdrawAmount));
-
-            customer.setBalance(balance);
-            customerService.save(customer);
-            Withdraw withdraw1 = new Withdraw();
-            withdraw1.setCustomer(customer);
-            model.addAttribute("withdraw",withdraw1);
-            return "/customer/withdraw";
-
-
-        }catch (Exception e){
-            return "/errors/404";
+        Optional<Customer> customerOptional = customerService.findById(id);
+        if (!customerOptional.isPresent()) {
+            model.addAttribute("error", true);
         }
+        else{
+            Customer customer1 = customerOptional.get();
+            customer.setId(id);
+            customer.setBalance(customer1.getBalance());
+            customerService.save(customer);
+            model.addAttribute("customer", customer);
+
+            model.addAttribute("success", true);
+            model.addAttribute("messages", "Update success");
+        }
+
+        return "customer/edit";
+    }
+    @PostMapping("/withdraw/{idCustomer}")
+    public String doWithdraw(@PathVariable Long idCustomer, @ModelAttribute Withdraw withdraw, Model model){
+        Optional<Customer> customerOptional = customerService.findById(idCustomer);
+        if (customerOptional.isEmpty()){
+            model.addAttribute("error", true);
+            model.addAttribute("message", "ID không tồn tại");
+        } else {
+            Customer customer = customerOptional.get();
+            BigDecimal currentBalance = customer.getBalance();
+            if (currentBalance.compareTo(withdraw.getTransactionAmount()) >= 0) {
+                BigDecimal newBalance = currentBalance.subtract(withdraw.getTransactionAmount());
+                customer.setBalance(newBalance);
+                customer.setId(idCustomer);
+                customerService.save(customer);
+
+                withdraw.setId(null);
+                withdraw.setCustomer(customer);
+                withdrawService.save(withdraw);
+                model.addAttribute("success", true);
+                model.addAttribute("message", "Rút thành công: " + withdraw.getTransactionAmount() + " $");
+            } else {
+                model.addAttribute("error", true);
+                model.addAttribute("message", "Số dư không đủ");
+                withdraw.setCustomer(customer);
+            }
+            model.addAttribute("withdraw", withdraw);
+        }
+        return "customer/withdraw";
     }
 
     @PostMapping("/transfer/{senderId}")
