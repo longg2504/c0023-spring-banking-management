@@ -19,6 +19,8 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
 
     List<Customer> findAllByIdNotAndDeletedIsFalse(Long id);
 
+    boolean existsByEmail(String email);
+
     @Modifying
     @Query("UPDATE Customer AS c SET c.balance = c.balance + :transactionAmount WHERE c.id = :customerId")
     void incrementBalance(@Param("customerId") Long customerId, @Param("transactionAmount") BigDecimal transactionAmount);

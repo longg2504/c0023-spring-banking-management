@@ -18,3 +18,12 @@ header{
     color: #fff;
     font-weight: bold;
 }
+
+footer {
+    position: fixed !important;
+    bottom: 0;
+    left: 0;
+    height: auto;
+    margin-bottom: 0 !important;
+    width: 100%;
+}

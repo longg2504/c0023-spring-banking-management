@@ -56,35 +56,44 @@
         </form>
     </div>
 </div>
-<footer class="container-fluid">
+
+<footer>
+    <th:block th:if="${hasError == true || error == true}">
+        <div class="alert alert-danger">
+            <div class="container">
+                <div class="error-area">
+                    <th:block th:if="${error == true}">
+                        <div class="error">
+                            <ul class="container">
+                                <li th:text="${messages}"></li>
+                            </ul>
+                        </div>
+                    </th:block>
+
+                    <th:block th:if="${hasError == true}">
+                        <div class="error">
+                            <ul class="container">
+                                <li th:text="${messages}"></li>
+                                <li th:each="err : ${#fields.errors('deposit.*')}" th:text="${err}"></li>
+                            </ul>
+                        </div>
+                    </th:block>
+                </div>
+            </div>
+        </div>
+    </th:block>
+
     <th:block th:if="${success == true}">
-        <div class="success">
-            <ul class="container">
-                <li th:text="${messages}"></li>
-            </ul>
+        <div class="alert alert-success">
+            <div class="success">
+                <ul class="container">
+                    <li th:text="${messages}"></li>
+                </ul>
+            </div>
         </div>
     </th:block>
-
-    <th:block th:if="${error == true}">
-        <div class="error">
-            <ul class="container">
-                <li th:text="${messages}"></li>
-            </ul>
-        </div>
-    </th:block>
-
-    <th:block th:if="${error == true}">
-        <div class="error">
-            <ul class="container">
-                <li th:each="err : ${#fields.errors('deposit.*')}" th:text="${err}"></li>
-            </ul>
-        </div>
-    </th:block>
-
 
 </footer>
-
-<th:block th:replace="layout/script" />
 
 </body>
 </html>

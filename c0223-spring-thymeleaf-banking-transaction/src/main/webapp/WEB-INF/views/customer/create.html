@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
@@ -57,13 +57,51 @@
     </div>
 </div>
 
-<footer class="container-fluid">
+
+<footer class="alert alert-success">
+    <div class="container">
+        <th:block th:if="${success == true}">
+            <div class="bs-success">
+                <ul>
+                    <li th:text="${messages}"></li>
+                </ul>
+            </div>
+        </th:block>
+    </div>
+</footer>
+
+<footer>
+    <th:block th:if="${hasError == true || notValid == true}">
+        <div class="alert alert-danger">
+            <div class="container">
+                <div class="error-area">
+                    <th:block th:if="${notValid == true}">
+                        <div class="error">
+                            <ul class="container">
+                                <li th:text="${massage}"></li>
+                            </ul>
+                        </div>
+                    </th:block>
+
+                    <th:block th:if="${hasError == true}">
+                        <div class="error">
+                            <ul class="container">
+                                <li th:each="err : ${#fields.errors('customer.*')}" th:text="${err}"></li>
+                            </ul>
+                        </div>
+                    </th:block>
+                </div>
+            </div>
+        </div>
+    </th:block>
 
     <th:block th:if="${success == true}">
-        <div class="success">
-            <ul class="container">
-                <li th:text="${messages}"></li>
-            </ul>
+        <div class="alert alert-success">
+            <div class="success">
+                <ul class="container">
+                    <li th:text="${messages}"></li>
+                </ul>
+            </div>
         </div>
     </th:block>
 </footer>

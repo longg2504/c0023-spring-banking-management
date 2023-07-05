@@ -1,6 +1,9 @@
 package com.cg.model;
 
 
+import org.springframework.validation.Errors;
+import org.springframework.validation.Validator;
+
 import javax.persistence.*;
 import java.math.BigDecimal;
 
@@ -8,7 +11,7 @@ import java.math.BigDecimal;
 
 @Entity
 @Table(name = "transfers")
-public class Transfer extends BaseEntity {
+public class Transfer extends BaseEntity implements Validator {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -102,5 +105,22 @@ public class Transfer extends BaseEntity {
 
     public void setTransactionAmount(BigDecimal transactionAmount) {
         this.transactionAmount = transactionAmount;
+    }
+
+    @Override
+    public boolean supports(Class<?> aClass) {
+        return  Transfer.class.isAssignableFrom(aClass);
+    }
+
+    @Override
+    public void validate(Object target, Errors errors) {
+        Transfer transfer = (Transfer) target;
+
+        BigDecimal transferAmount = transfer.transferAmount;
+        if (transferAmount == null) {
+            errors.rejectValue("transferAmount","transfer.transferAmount.notnull");
+        }else if(transferAmount.compareTo(BigDecimal.ZERO) <=0 ) {
+            errors.rejectValue("transferAmount","transfer.transferAmount.valid");
+        }
     }
 }

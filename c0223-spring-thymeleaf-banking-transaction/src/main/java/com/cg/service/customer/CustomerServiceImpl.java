@@ -110,4 +110,10 @@ public class CustomerServiceImpl implements ICustomerService {
 
         return transfer;
     }
+
+    @Override
+    public Boolean existsByEmail(String email) {
+        return customerRepository.existsByEmail(email);
+    }
+
 }
